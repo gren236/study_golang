@@ -2,8 +2,7 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/study_golang/pkg/string"
+	"github.com/gren236/study_golang/pkg/string"
 )
 
 // `go run` - run as interpreter
