@@ -2,3 +2,4 @@
 
 `go run` is interpreter mode. Need to test interpreter vs compiler performance.
 
+`main` package declared in each file present inside this directory, so be sure to pass a specific file to compiler/interpreter.
