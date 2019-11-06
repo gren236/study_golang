@@ -12,6 +12,12 @@ func main() {
 
 	b := [5]int{1, 2, 2 + 1, 4, 5}
 	fmt.Println("dcl:", b)
+
+	// Count elements automatically
+	d := []string{"Penn", "Teller"}
+	//      ^  slice  v  array
+	e := [...]string{"Penn", "Teller"}
+	fmt.Printf("%T and %T\n", d, e)
 	
 	// Two dimensional array
 	var twoD [2]([3]int)
