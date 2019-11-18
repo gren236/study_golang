@@ -37,7 +37,7 @@ func main() {
 	// It rewrites the key. So the struct value only has to match.
 
 	fmt.Println("len:", len(n))
-	
+
 	// Delete a pair
 	delete(n, false)
 	fmt.Println(n)
@@ -58,4 +58,9 @@ func main() {
 	// New map built with nil value. Below code cause runtime panic.
 	// nMap[1] = 2
 	fmt.Println(nMap)
+
+	// What?
+	// panic: runtime error: invalid memory address or nil pointer dereference
+	// map2 := map[string]*Foo {"x":{"one"}}
+	// map2["z"].Bar = "what?" //???
 }
