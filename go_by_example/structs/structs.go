@@ -20,6 +20,10 @@ type Bar struct {
 	Data
 }
 
+type Dog struct {
+	Action func()
+}
+
 func NewPerson(name string, age int) *Person {
 	p := Person{
 		Name: name,
@@ -69,4 +73,12 @@ func main() {
 	spf.bool = true
 	spf.int = 1997
 	fmt.Println(spf)
+
+	// Structs can also have functions in fields
+	dog := Dog{}
+	dog.Action = func() {
+		fmt.Println("Bark!")
+	}
+
+	dog.Action()
 }
