@@ -67,6 +67,4 @@ func main() {
 	mutex.Lock()
 	fmt.Println("state:", state)
 	mutex.Unlock()
-
-	// TODO: How can we break this? :)
 }

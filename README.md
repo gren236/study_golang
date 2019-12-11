@@ -30,4 +30,8 @@ A nice article (screencast) containing the basics of Go tooling. Again, it won't
 ## Go By Example
 [Link](https://gobyexample.com/)
 
+## Run.go
+A great Medium series of articles which give some deep understanding of basic Golang concepts. It's a good idea to support some basic studing with these articles.  
+[Link](https://medium.com/rungo)
+
 `WIP`
