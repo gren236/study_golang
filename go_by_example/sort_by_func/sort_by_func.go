@@ -28,7 +28,7 @@ func (s byLength) Less(i, j int) bool {
 // Row - Sort structs by field values (e.g. id)
 // Struct itself
 type Row struct {
-	Id int
+	ID int
 }
 
 // Slice of structs to be sorted
@@ -46,7 +46,7 @@ func (s byIds) Swap(i, j int) {
 
 // If element i has ID lower than j - it comes before
 func (s byIds) Less(i, j int) bool {
-	return s[i].Id < s[j].Id
+	return s[i].ID < s[j].ID
 }
 
 func main() {
@@ -57,9 +57,9 @@ func main() {
 
 	// Sort structs by id
 	structs := []Row{
-		{Id: 4},
-		{Id: 10},
-		{Id: 1},
+		{ID: 4},
+		{ID: 10},
+		{ID: 1},
 	}
 	sort.Sort(byIds(structs))
 	fmt.Println(structs)
