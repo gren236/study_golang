@@ -30,6 +30,11 @@ A nice article (screencast) containing the basics of Go tooling. Again, it won't
 ## Go By Example
 [Link](https://gobyexample.com/)
 
+## The Go Blog
+An official source of Golang knowledge from the language creators and maintainers. One should visit this blog to answer questions about language basics and
+Specifications/implementations.  
+[Link](https://blog.golang.org/)
+
 ## Run.go
 A great Medium series of articles which give some deep understanding of basic Golang concepts. It's a good idea to support some basic studing with these articles.  
 [Link](https://medium.com/rungo)
