@@ -9,13 +9,30 @@ type Point struct {
 	x, y int
 }
 
+type Foo uint64
+
+type Bar uint64
+
+func (b Bar) String() string {
+	return fmt.Sprintf("the value of Bar is: %d\n", uint64(b))
+}
+
 func main() {
 	p := Point{1, 2}
+
+	// Print struct without any formatting or newline
+	fmt.Print(p); fmt.Print("\n")
+
+	// Put S before any function to get formatted string, not write it to stdout
+	pstr := fmt.Sprint(p)
+	fmt.Println(pstr)
+
 	// Print instance of Point struct
 	fmt.Printf("%v\n", p)
 
 	// Add + to also output struct field names
 	fmt.Printf("%+v\n", p)
+	fmt.Printf("%+v\n", &p)
 
 	// Use # instead of + to get value as a Go source code snippet
 	fmt.Printf("%#v\n", p)
@@ -32,14 +49,20 @@ func main() {
 	fmt.Printf("%b\n", 14)
 	// Character, corresponding to a given integer
 	fmt.Printf("%c\n", 33)
+	// Unicode format (use # to output original character next to code)
+	fmt.Printf("%#U\n", '⌘', '⌘')
 	// Hex encoding
 	fmt.Printf("%x\n", 456)
+	// Add # to show as in code, with leading "0x"
+	fmt.Printf("%#x\n", 456)
 
 	// Several format options for floats. f is for basic output
 	fmt.Printf("%f\n", 78.9)
 	// e and E - slightly different scientific notations
 	fmt.Printf("%e\n", 123400000.0)
 	fmt.Printf("%E\n", 123400000.0)
+	// %g or %G can be used to output float as-is, but use scientific notation if it's too large
+	fmt.Printf("%G\n", 123400000.023427384928374823)
 
 	// Basic string printing
 	fmt.Printf("%s\n", "\"string\"")
@@ -68,4 +91,13 @@ func main() {
 
 	// You can choose where to print output with Fprintf
 	fmt.Fprintf(os.Stderr, "as %s\n", "error")
+
+	// To use % character raw, you can escape it with another preceding %
+	fmt.Printf("%d%%\n", 15)
+
+	// Implement String method for custom type to use it with custom value for default %v verb
+	var ftype Foo = 345
+	fmt.Printf("%v\n", ftype)
+	var btype Bar = 42
+	fmt.Printf("%v\n", btype)
 }
