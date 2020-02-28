@@ -2,9 +2,10 @@ package main
 
 import "fmt"
 
+// Notice that tags are used!
 type Person struct {
-	Name string
-	Age int
+	Name string	`tag1`
+	Age int		`tag2`
 }
 
 type Foo struct {
@@ -81,4 +82,10 @@ func main() {
 	}
 
 	dog.Action()
+
+	// Tags are only visible for reflection and type identity!
+	fmt.Printf("%#v", Person{
+		Name: "Alan",
+		Age:  25,
+	})
 }
