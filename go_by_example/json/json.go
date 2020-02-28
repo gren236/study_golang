@@ -64,6 +64,9 @@ func main() {
 	}
 	res1B, _ := json.Marshal(res1D)
 	fmt.Println(string(res1B))
+	// Using MarshalIndent for more human-readable output
+	res1B2, _ := json.MarshalIndent(res1D, " ", "  ")
+	fmt.Println(string(res1B2))
 
 	// See how structure tags changed JSON output field names
 	res2D := response2{
