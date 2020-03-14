@@ -35,4 +35,11 @@ func main() {
 	r3 := rand.New(s3)
 	fmt.Print(r3.Intn(100), ",")
 	fmt.Println(r3.Intn(100))
+
+	// Shuffle is used to randomize slice elements
+	sl := []string{"Hello", "World", "foo", "bar"}
+	r1.Shuffle(len(sl), func(i, j int) {
+		sl[i], sl[j] = sl[j], sl[i]
+	})
+	fmt.Println(sl)
 }
