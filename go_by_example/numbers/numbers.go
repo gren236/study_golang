@@ -31,6 +31,11 @@ func main() {
 	fmt.Printf("%T - %v\n", i1, i1)
 
 	// Atoi is a convenience function for basic base-10 int parsing.
-	k, _ := strconv.Atoi("135")
+	k, _ := strconv.Atoi("-135")
 	fmt.Printf("%T - %v\n", k, k)
+
+	// Number thousands delimiters not supported!
+	d, err := strconv.ParseInt("123_234_432", 10, 64)
+	fmt.Printf("%T - %v\n", d)
+	fmt.Println(err)
 }
