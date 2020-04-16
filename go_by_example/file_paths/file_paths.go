@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -44,4 +45,13 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(rel)
+
+	// Using Glob for filepath patterns
+	files, err := filepath.Glob("/home/gren236/Pictures/*.jpg")
+
+	for _, file := range files {
+		f, _ := os.Stat(file)
+
+		fmt.Println(f.Mode(), "	", f.Name())
+	}
 }
