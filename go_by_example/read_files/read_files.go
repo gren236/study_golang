@@ -25,6 +25,24 @@ func main() {
 	check(err)
 	fmt.Printf("%#v\n", f)
 
+	// Flags to open files can be combined
+	file, err := os.OpenFile("/dev/urandom", os.O_CREATE | os.O_RDONLY, 0775)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	fmt.Println(file.Fd())
+
+	data := make([]byte, 10)
+	n, err := file.Read(data)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
+	for i := 0; i < 4; i++ {
+		file.Read(data)
+		fmt.Printf("Read %v bytes: %s\n", n, data)
+	}
+
 	// Read bytes from file using buffer
 	b1 := make([]byte, 5)
 	// Read writes bytes to buffer, returns how many bytes were read
