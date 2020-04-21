@@ -1,4 +1,4 @@
-package main
+package testing
 
 import (
 	"fmt"
@@ -22,6 +22,7 @@ func TestIntMinBasic(t *testing.T) {
 		// t.Fail reports of a failure and stops all the tests
 		t.Errorf("IntMin(2, -2) = %d; want -2", ans)
 	}
+	t.Log("This is some additional info that seen in verbose mode only.")
 }
 
 // Test inputs can be repetitive, so it's better to use table driven style
