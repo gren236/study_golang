@@ -22,35 +22,46 @@ func gen(nums ...int) <-chan int {
 }
 
 // Second stage - receiving numbers through channel and returning a channel with numbers' squares
-func sq(in <-chan int) <-chan int {
+func sq(done <-chan struct{}, in <-chan int) <-chan int {
 	out := make(chan int)
 
 	go func() {
+		defer close(out)
 		for n := range in {
-			out <- n*n
+			select {
+			case out <- n * n:
+			case <-done:
+				return
+			}
 		}
-		close(out)
 	}()
 
 	return out
 }
 
 // merge merges received channels to a single one
-func merge(cs... <-chan int) <-chan int {
+func merge(done <-chan struct{}, cs... <-chan int) <-chan int {
 	var wg sync.WaitGroup
 	out := make(chan int)
 
+	// Start an output goroutine for each input channel in cs.  output
+	// copies values from c to out until c or done is closed, then calls
+	// wg.Done
 	output := func(ch <-chan int) {
+		defer wg.Done()
 		for n := range ch {
-			out <- n
+			select {
+			case out <- n:
+			case <-done:
+				return
+			}
 		}
-		wg.Done()
 	}
 
 	// Add wait group according to number of received inbound channels (Nice tip!)
 	wg.Add(len(cs))
 	for _, c := range cs {
-		output(c)
+		go output(c)
 	}
 	go func() {
 		wg.Wait()
@@ -60,28 +71,42 @@ func merge(cs... <-chan int) <-chan int {
 }
 
 // Main function is the final stage - receiving values from second stage and printing them
+//
+// Here are the guidelines for pipeline construction:
+// * stages close their outbound channels when all the send operations are done.
+// * stages keep receiving values from inbound channels until those channels are closed or the senders are unblocked.
+// Pipelines unblock senders either by ensuring there's enough buffer for all the values that are sent or by explicitly
+// signalling senders when the receiver may abandon the channel.
 func main() {
-	c := gen(2, 3, 4, 5)
-	out := sq(c)
-
-	for n := range out {
-		fmt.Println(n)
-	}
-	fmt.Println()
+	// Basic usage
+	//c := gen(2, 3, 4, 5)
+	//out := sq(c)
+	//
+	//for n := range out {
+	//	fmt.Println(n)
+	//}
+	//fmt.Println()
 
 	// We can run pipeline as we want. Even call stages multiple times:
-	for n := range sq(sq(gen(2, 3, 4))) {
-		fmt.Println(n)
-	}
-	fmt.Println()
+	//for n := range sq(sq(gen(2, 3, 4))) {
+	//	fmt.Println(n)
+	//}
+	//fmt.Println()
 
 	// Fan-in usage - distribute multiple inbound channels between the second stage to parallelize work
 	in := gen(2, 3, 4, 5)
 
-	c1 := sq(in)
-	c2 := sq(in)
+	// Set up a done channel that's shared by the whole pipeline,
+	// and close that channel when this pipeline exits, as a signal
+	// for all the goroutines we started to exit.
+	done := make(chan struct{})
+	defer close(done)
 
-	for n := range merge(c1, c2) {
+	c1 := sq(done, in)
+	c2 := sq(done, in)
+
+	for n := range merge(done, c1, c2) {
 		fmt.Println(n)
 	}
+	// Done will be closed by a deferred call
 }
