@@ -18,6 +18,7 @@ type result struct {
 }
 
 // First pipeline - schedules file reads and sum calculating
+// Bad design as goroutine scheduled for every file - dangerous for huge directoies
 func sumFiles(done <-chan struct{}, root string) (<-chan result, <-chan error) {
 	// For each regular file, start a goroutine that sums the file and sends
 	// the result on c. Send the result of the walk on errc
@@ -46,7 +47,7 @@ func sumFiles(done <-chan struct{}, root string) (<-chan result, <-chan error) {
 			// Abort the walk if done received
 			select {
 			case <-done:
-				return errors.New("Walk operation canceled")
+				return errors.New("walk operation canceled")
 			default:
 				return nil
 			}
