@@ -10,6 +10,8 @@ type myKey int
 
 const key myKey = 0
 
+// Main rule is: incoming requests should create a context,
+// outgoing i/o call should accept a context
 func main() {
 	// Create the context that can be canceled
 	ctx, cancel := context.WithCancel(context.Background())

@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Context is provided by request, but we should derive it for any app async i/o calls
 func hello(w http.ResponseWriter, r *http.Request) {
 	// Context is available on every request
 	ctx := r.Context()
