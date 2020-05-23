@@ -70,7 +70,7 @@ func main() {
 	foo() // Call foo function
 
 	fmt.Println("main() done")
-	// Conclusion: defered functions are called LIFO - following the call stack from inner to outer functions
+	// Conclusion: deferred functions are called LIFO - following the call stack from inner to outer functions
 
 	// Panic can also be caught by recover() function (See recover.go)
 }

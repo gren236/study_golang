@@ -5,6 +5,12 @@ import (
 	"time"
 )
 
+type Test []byte
+
+func (t Test) String() string {
+	return string(t)
+}
+
 func main() {
 	switch time.Now().Weekday() {
 	case time.Saturday, time.Sunday:
@@ -52,4 +58,28 @@ func main() {
 	default:
 		fmt.Println("default")
 	}
+
+	// Type switch can also check if other interface is implemented!
+	var testBytes interface{}
+	testBytes = Test("Hello!")
+	switch testBytes.(type) {
+	case []byte:
+		fmt.Println("It's a byte slice!")
+	case string:
+		fmt.Println("It's string!")
+	case fmt.Stringer:
+		fmt.Println(testBytes)
+	}
+
+	// This is the same as following:
+	if _, ok := testBytes.([]byte); ok {
+		fmt.Println("It's a byte slice!")
+	} else if _, ok := testBytes.(string); ok {
+		fmt.Println("It's string!")
+	} else if _, ok := testBytes.(fmt.Stringer); ok {
+		fmt.Println(testBytes)
+	}
+
+	fmt.Printf("%T\n", testBytes.(Test))
+	fmt.Printf("%T\n", testBytes.(fmt.Stringer))
 }

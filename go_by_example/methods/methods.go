@@ -47,6 +47,13 @@ func (s *SomeString) Update(str string) {
 	*s = SomeString(str)
 }
 
+// Even for functions!
+type TestFunc func(test string) string
+
+func (f TestFunc) Greet(name string) {
+	fmt.Println("Hello,", f(name))
+}
+
 func main() {
 	r := Rect{width: 10, height: 5}
 
@@ -75,4 +82,10 @@ func main() {
 	somes = "Hello!"
 	somes.Update("Foo!")
 	fmt.Println(somes)
+
+	// Usage of methods for function custom type
+	var tf TestFunc = func(test string) string {
+		return test
+	}
+	tf.Greet("John")
 }

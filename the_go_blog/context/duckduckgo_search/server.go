@@ -17,8 +17,8 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	// ctx.Done channel, which is the cancellation signal for requests
 	// started by this handler
 	var (
-		ctx		context.Context
-		cancel	context.CancelFunc
+		ctx    context.Context
+		cancel context.CancelFunc
 	)
 	timeout, err := time.ParseDuration(r.FormValue("timeout"))
 	if err == nil {
