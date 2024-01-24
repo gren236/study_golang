@@ -1,6 +1,6 @@
 module github.com/gren236/study_golang
 
-go 1.13
+go 1.21
 
 require (
 	github.com/pkg/errors v0.9.1
