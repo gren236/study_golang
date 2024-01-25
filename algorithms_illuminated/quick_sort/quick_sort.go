@@ -61,10 +61,10 @@ func partition(arr []int) int {
 	return i - 1
 }
 
-func quickSort(arr []int, comps *int, choosePivot func(arr []int) int) {
+func quickSort(arr []int, choosePivot func(arr []int) int) int {
 	// Base case.
 	if len(arr) <= 1 {
-		return
+		return 0
 	}
 
 	i := choosePivot(arr)
@@ -72,23 +72,13 @@ func quickSort(arr []int, comps *int, choosePivot func(arr []int) int) {
 	// Swap pivot with first element
 	arr[0], arr[i] = arr[i], arr[0]
 
-	*comps = *comps + (len(arr) - 1)
+	comps := len(arr) - 1
 	j := partition(arr) // j - new pivot
 
-	l := arr[0:j]
-	r := arr[j+1:]
+	lComps := quickSort(arr[0:j], choosePivot)
+	rComps := quickSort(arr[j+1:], choosePivot)
 
-	// Add number of comparisons to total
-	//if len(l) > 1 {
-	//	*comps = *comps + (len(l) - 1)
-	//}
-	//
-	//if len(r) > 1 {
-	//	*comps = *comps + (len(r) - 1)
-	//}
-
-	quickSort(l, comps, choosePivot)
-	quickSort(r, comps, choosePivot)
+	return comps + lComps + rComps
 }
 
 func main() {
@@ -108,12 +98,10 @@ func main() {
 	sort.Ints(inputWant)
 
 	// Run sort
-	comps := new(int)
-
-	quickSort(input, comps, choosePivotMedian)
+	comps := quickSort(input, choosePivotMedian)
 
 	// Output comparisons total
-	fmt.Println(*comps)
+	fmt.Println(comps)
 
 	// Check sorting is correct
 	fmt.Println(reflect.DeepEqual(input, inputWant))
