@@ -34,6 +34,10 @@ func (c *Container[T]) ExtractMin() T {
 	return res
 }
 
+func (c *Container[T]) PeekMin() T {
+	return (*c)[0]
+}
+
 func (c *Container[T]) Insert(v T) {
 	*c = append(*c, v)
 
