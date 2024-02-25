@@ -60,6 +60,103 @@ func TestNewSingly(t *testing.T) {
 	}
 }
 
+func TestSingly_Delete(t *testing.T) {
+	type args[T any] struct {
+		eq func(T) bool
+	}
+	type testCase[T any] struct {
+		name   string
+		s      *Singly[T]
+		args   args[T]
+		wantS  *Singly[T]
+		wantOk bool
+	}
+	tests := []testCase[testVal]{
+		{
+			name: "Value found in middle and deleted",
+			s:    createTestLinkedList(),
+			args: args[testVal]{
+				eq: func(val testVal) bool {
+					return val.key == 1
+				},
+			},
+			wantS: &Singly[testVal]{
+				size: 2,
+				head: &Node[testVal]{
+					n: &Node[testVal]{
+						n: nil,
+						v: testVal{0, 42},
+					},
+					v: testVal{2, 44},
+				},
+			},
+			wantOk: true,
+		},
+		{
+			name: "Value found at head and deleted",
+			s:    createTestLinkedList(),
+			args: args[testVal]{
+				eq: func(val testVal) bool {
+					return val.key == 2
+				},
+			},
+			wantS: &Singly[testVal]{
+				size: 2,
+				head: &Node[testVal]{
+					n: &Node[testVal]{
+						n: nil,
+						v: testVal{0, 42},
+					},
+					v: testVal{1, 43},
+				},
+			},
+			wantOk: true,
+		},
+		{
+			name: "Value found at the end and deleted",
+			s:    createTestLinkedList(),
+			args: args[testVal]{
+				eq: func(val testVal) bool {
+					return val.key == 0
+				},
+			},
+			wantS: &Singly[testVal]{
+				size: 2,
+				head: &Node[testVal]{
+					n: &Node[testVal]{
+						n: nil,
+						v: testVal{1, 43},
+					},
+					v: testVal{2, 44},
+				},
+			},
+			wantOk: true,
+		},
+		{
+			name: "Value not found",
+			s:    createTestLinkedList(),
+			args: args[testVal]{
+				eq: func(val testVal) bool {
+					return val.key == 5
+				},
+			},
+			wantS:  createTestLinkedList(),
+			wantOk: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotOk := tt.s.Delete(tt.args.eq); gotOk != tt.wantOk {
+				t.Errorf("Delete() = %v, want %v", gotOk, tt.wantOk)
+			}
+
+			if !reflect.DeepEqual(tt.s, tt.wantS) {
+				t.Errorf("Delete() got list = %v, want %v", tt.s, tt.wantS)
+			}
+		})
+	}
+}
+
 func TestSingly_Search(t *testing.T) {
 	type args[T any] struct {
 		eq func(T) bool

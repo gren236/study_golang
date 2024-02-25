@@ -26,16 +26,6 @@ type Table[T key, U any] struct {
 	objNum  int
 }
 
-func newBuckets[T key, U any](size int) *[]linkedl.Singly[*container[T, U]] {
-	buckets := make([]linkedl.Singly[*container[T, U]], size)
-
-	for i := range size {
-		buckets[i] = linkedl.Singly[*container[T, U]]{}
-	}
-
-	return &buckets
-}
-
 func New[T key, U any]() *Table[T, U] {
 	tbl := &Table[T, U]{}
 	tbl.buckets = newBuckets[T, U](initialSize)
@@ -51,29 +41,71 @@ func (t *Table[T, U]) Insert(k T, v U) {
 	}
 
 	// Get a new bucket index for key and insert
-	// TODO implement
+	c := container[T, U]{k, v}
+	insertContainer(*t.buckets, &c)
+
+	t.objNum++
 }
 
 func (t *Table[T, U]) Delete(k T) {
-	// TODO implement
+	i := getBucketIndex(uint64(len(*t.buckets)), k.Bytes())
+
+	deleted := (*t.buckets)[i].Delete(func(c *container[T, U]) bool {
+		return c.key == k
+	})
+	if deleted {
+		t.objNum--
+	}
 }
 
 func (t *Table[T, U]) Search(k T) (res U, ok bool) {
-	// TODO implement
+	i := getBucketIndex(uint64(len(*t.buckets)), k.Bytes())
+
+	cf, found := (*t.buckets)[i].Search(func(c *container[T, U]) bool {
+		return c.key == k
+	})
+	if found {
+		res, ok = cf.val, true
+	}
 
 	return
 }
 
 func (t *Table[T, U]) growTable(newSize int) {
-	// TODO implement
-}
+	resized := newBuckets[T, U](newSize)
 
-func (t *Table[T, U]) getBucketIndex(k []byte) uint64 {
-	hashSum := HashDJB2(k)
+	// Go through all the current elements and rehash to new buckets
+	for _, cl := range *t.buckets {
+		for c, ok := cl.Next(); ok; c, ok = cl.Next() {
+			insertContainer(*resized, c)
+		}
+	}
 
-	return (hashSum % uint64(len(*t.buckets))) - uint64(1)
+	t.buckets = resized
 }
 
 func (t *Table[T, U]) getLoad() float64 {
 	return float64(t.objNum) / float64(len(*t.buckets))
+}
+
+func newBuckets[T key, U any](size int) *[]linkedl.Singly[*container[T, U]] {
+	buckets := make([]linkedl.Singly[*container[T, U]], size)
+
+	for i := range size {
+		buckets[i] = linkedl.Singly[*container[T, U]]{}
+	}
+
+	return &buckets
+}
+
+func getBucketIndex(bSize uint64, k []byte) uint64 {
+	hashSum := HashDJB2(k)
+
+	return (hashSum % bSize) - uint64(1)
+}
+
+func insertContainer[T key, U any](buckets []linkedl.Singly[*container[T, U]], c *container[T, U]) {
+	i := getBucketIndex(uint64(len(buckets)), c.key.Bytes())
+
+	buckets[i].Insert(c)
 }
