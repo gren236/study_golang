@@ -34,6 +34,10 @@ func New[T key, U any]() *Table[T, U] {
 }
 
 func (t *Table[T, U]) Insert(k T, v U) {
+	if _, ok := t.Get(k); ok {
+		return
+	}
+
 	// Check the table load
 	if t.getLoad() >= loadThreshold {
 		// Grow the table
@@ -58,7 +62,7 @@ func (t *Table[T, U]) Delete(k T) {
 	}
 }
 
-func (t *Table[T, U]) Search(k T) (res U, ok bool) {
+func (t *Table[T, U]) Get(k T) (res U, ok bool) {
 	i := getBucketIndex(uint64(len(*t.buckets)), k.Bytes())
 
 	cf, found := (*t.buckets)[i].Search(func(c *container[T, U]) bool {

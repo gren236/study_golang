@@ -85,6 +85,10 @@ func (s *Singly[T]) Search(eq func(T) bool) (res T, ok bool) {
 func (s *Singly[T]) Next() (T, bool) {
 	res := s.head
 
+	if res == nil {
+		return *new(T), false
+	}
+
 	if s.cursor != nil {
 		if s.cursor.n == nil {
 			return *new(T), false
