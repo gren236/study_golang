@@ -75,6 +75,10 @@ func (t *Table[T, U]) Get(k T) (res U, ok bool) {
 	return
 }
 
+func (t *Table[T, U]) Len() int {
+	return t.objNum
+}
+
 func (t *Table[T, U]) growTable(newSize int) {
 	resized := newBuckets[T, U](newSize)
 
@@ -105,7 +109,7 @@ func newBuckets[T key, U any](size int) *[]linkedl.Singly[*container[T, U]] {
 func getBucketIndex(bSize uint64, k []byte) uint64 {
 	hashSum := HashDJB2(k)
 
-	return (hashSum % bSize) - uint64(1)
+	return hashSum % bSize
 }
 
 func insertContainer[T key, U any](buckets []linkedl.Singly[*container[T, U]], c *container[T, U]) {
