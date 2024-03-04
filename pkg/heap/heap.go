@@ -4,14 +4,26 @@ type Comparable[T any] interface {
 	Less(T) bool
 }
 
-type Container[T Comparable[T]] []T
+type Container[T Comparable[T]] struct {
+	storage       []T
+	onIndexUpdate func(*T, int)
+}
+
+func NewHeap[T Comparable[T]](updateIndex func(*T, int)) *Container[T] {
+	return &Container[T]{
+		storage:       make([]T, 0),
+		onIndexUpdate: updateIndex,
+	}
+}
 
 func NewHeapFromSlice[T Comparable[T]](arr []T) *Container[T] {
-	res := make(Container[T], len(arr))
+	res := Container[T]{
+		storage: make([]T, len(arr)),
+	}
 
 	// Copy array to container
 	for i, v := range arr {
-		res[i] = v
+		res.storage[i] = v
 	}
 
 	// Heapify container
@@ -23,10 +35,14 @@ func NewHeapFromSlice[T Comparable[T]](arr []T) *Container[T] {
 }
 
 func (c *Container[T]) ExtractMin() T {
-	res := (*c)[0]
+	res := c.storage[0]
 
-	(*c)[0], (*c)[len(*c)-1] = (*c)[len(*c)-1], (*c)[0]
-	*c = (*c)[:len(*c)-1]
+	c.storage[0], c.storage[len(c.storage)-1] = c.storage[len(c.storage)-1], c.storage[0]
+	c.storage = c.storage[:len(c.storage)-1]
+
+	if c.onIndexUpdate != nil {
+		c.onIndexUpdate(&c.storage[0], 0)
+	}
 
 	// Restore heap property
 	c.bubbleDown(0)
@@ -34,53 +50,99 @@ func (c *Container[T]) ExtractMin() T {
 	return res
 }
 
+func (c *Container[T]) GetByIndex(i int) (res T) {
+	if i < 0 || i >= len(c.storage) {
+		return
+	}
+
+	res = c.storage[i]
+
+	return
+}
+
+func (c *Container[T]) Delete(i int) {
+	if i < 0 || i >= len(c.storage) {
+		return
+	}
+
+	c.storage[i], c.storage[len(c.storage)-1] = c.storage[len(c.storage)-1], c.storage[i]
+	c.storage = c.storage[:len(c.storage)-1]
+
+	if c.onIndexUpdate != nil {
+		c.onIndexUpdate(&c.storage[i], i)
+	}
+
+	// Restore heap property
+	c.bubbleDown(i)
+
+	return
+}
+
 func (c *Container[T]) PeekMin() T {
-	return (*c)[0]
+	return c.storage[0]
+}
+
+func (c *Container[T]) Len() int {
+	return len(c.storage)
 }
 
 func (c *Container[T]) Insert(v T) {
-	*c = append(*c, v)
+	c.storage = append(c.storage, v)
 
 	// Restore heap property
-	c.bubbleUp(len(*c) - 1)
+	c.bubbleUp(len(c.storage) - 1)
 }
 
-func (c *Container[T]) bubbleDown(i int) {
-	for i*2+1 <= len(*c)-1 {
+func (c *Container[T]) bubbleDown(i int) int {
+	updateHook := c.onIndexUpdate != nil
+
+	for i*2+1 <= len(c.storage)-1 {
 		iL := i*2 + 1
 		iR := i*2 + 2
-		rPresent := iR <= len(*c)-1
+		rPresent := iR <= len(c.storage)-1
 
 		// Check heap property
-		if !rPresent && (*c)[i].Less((*c)[iL]) {
+		if !rPresent && c.storage[i].Less(c.storage[iL]) {
 			break
 		}
 
-		if rPresent && (*c)[i].Less((*c)[iR]) && (*c)[i].Less((*c)[iL]) {
+		if rPresent && c.storage[i].Less(c.storage[iR]) && c.storage[i].Less(c.storage[iL]) {
 			break
 		}
 
 		iChild := iL
-		if rPresent && (*c)[iR].Less((*c)[iL]) {
+		if rPresent && c.storage[iR].Less(c.storage[iL]) {
 			iChild = iR
 		}
 
-		(*c)[i], (*c)[iChild] = (*c)[iChild], (*c)[i]
+		c.storage[i], c.storage[iChild] = c.storage[iChild], c.storage[i]
+		if updateHook {
+			c.onIndexUpdate(&c.storage[i], i)
+			c.onIndexUpdate(&c.storage[iChild], iChild)
+		}
 
 		i = iChild
 	}
+
+	return i
 }
 
 func (c *Container[T]) bubbleUp(i int) {
+	updateHook := c.onIndexUpdate != nil
+
 	for i > 0 {
 		iPrt := (i - 1) / 2
 
-		if (*c)[iPrt].Less((*c)[i]) {
+		if c.storage[iPrt].Less(c.storage[i]) {
 			// If parent is already less than inserted, do nothing
 			break
 		}
 
-		(*c)[iPrt], (*c)[i] = (*c)[i], (*c)[iPrt]
+		c.storage[iPrt], c.storage[i] = c.storage[i], c.storage[iPrt]
+		if updateHook {
+			c.onIndexUpdate(&c.storage[i], i)
+			c.onIndexUpdate(&c.storage[iPrt], iPrt)
+		}
 
 		i = iPrt
 	}

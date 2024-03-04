@@ -26,7 +26,9 @@ func TestNewHeapFromSlice(t *testing.T) {
 			args: args[testVal]{
 				arr: []testVal{9, 8, 7, 6, 5, 4, 3, 2, 1},
 			},
-			want: &Container[testVal]{1, 2, 3, 6, 5, 4, 7, 8, 9},
+			want: &Container[testVal]{
+				storage: []testVal{1, 2, 3, 6, 5, 4, 7, 8, 9},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -46,10 +48,14 @@ func Test_container_ExtractMin(t *testing.T) {
 		want  testVal
 	}{
 		{
-			name:  "Regular size",
-			c:     Container[testVal]{4, 4, 8, 9, 4, 12, 9, 11, 13},
-			wantC: Container[testVal]{4, 4, 8, 9, 13, 12, 9, 11},
-			want:  4,
+			name: "Regular size",
+			c: Container[testVal]{
+				storage: []testVal{4, 4, 8, 9, 4, 12, 9, 11, 13},
+			},
+			wantC: Container[testVal]{
+				storage: []testVal{4, 4, 8, 9, 13, 12, 9, 11},
+			},
+			want: 4,
 		},
 	}
 	for _, tt := range tests {
@@ -61,6 +67,52 @@ func Test_container_ExtractMin(t *testing.T) {
 			}
 			if !reflect.DeepEqual(tt.c, tt.wantC) {
 				t.Errorf("ExtractMin() Container = %v, want Container %v", tt.c, tt.wantC)
+			}
+		})
+	}
+}
+
+func Test_container_Delete(t *testing.T) {
+	type args struct {
+		i int
+	}
+	tests := []struct {
+		name  string
+		c     Container[testVal]
+		args  args
+		wantC Container[testVal]
+	}{
+		{
+			name: "Regular size",
+			c: Container[testVal]{
+				storage: []testVal{4, 4, 8, 9, 4, 12, 9, 11, 13},
+			},
+			args: args{
+				i: 1,
+			},
+			wantC: Container[testVal]{
+				storage: []testVal{4, 4, 8, 9, 13, 12, 9, 11},
+			},
+		},
+		{
+			name: "Regular size 2",
+			c: Container[testVal]{
+				storage: []testVal{4, 4, 8, 9, 4, 12, 9, 11, 13},
+			},
+			args: args{
+				i: 2,
+			},
+			wantC: Container[testVal]{
+				storage: []testVal{4, 4, 9, 9, 4, 12, 13, 11},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.c.Delete(tt.args.i)
+
+			if !reflect.DeepEqual(tt.c, tt.wantC) {
+				t.Errorf("Delete() Container = %v, want Container %v", tt.c, tt.wantC)
 			}
 		})
 	}
@@ -78,19 +130,27 @@ func Test_container_Insert(t *testing.T) {
 	}{
 		{
 			name: "Regular size: new min",
-			c:    Container[testVal]{4, 4, 8, 9, 4, 12, 9, 11, 13},
+			c: Container[testVal]{
+				storage: []testVal{4, 4, 8, 9, 4, 12, 9, 11, 13},
+			},
 			args: args{
 				v: 3,
 			},
-			wantC: Container[testVal]{3, 4, 8, 9, 4, 12, 9, 11, 13, 4},
+			wantC: Container[testVal]{
+				storage: []testVal{3, 4, 8, 9, 4, 12, 9, 11, 13, 4},
+			},
 		},
 		{
 			name: "Regular size: do one swap",
-			c:    Container[testVal]{4, 4, 8, 9, 6, 12, 9, 11, 13},
+			c: Container[testVal]{
+				storage: []testVal{4, 4, 8, 9, 6, 12, 9, 11, 13},
+			},
 			args: args{
 				v: 5,
 			},
-			wantC: Container[testVal]{4, 4, 8, 9, 5, 12, 9, 11, 13, 6},
+			wantC: Container[testVal]{
+				storage: []testVal{4, 4, 8, 9, 5, 12, 9, 11, 13, 6},
+			},
 		},
 	}
 	for _, tt := range tests {
