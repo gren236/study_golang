@@ -37,17 +37,47 @@ func NewHeapFromSlice[T Comparable[T]](arr []T) *Container[T] {
 func (c *Container[T]) ExtractMin() T {
 	res := c.storage[0]
 
-	c.storage[0], c.storage[len(c.storage)-1] = c.storage[len(c.storage)-1], c.storage[0]
-	c.storage = c.storage[:len(c.storage)-1]
-
-	if c.onIndexUpdate != nil {
-		c.onIndexUpdate(&c.storage[0], 0)
-	}
+	c.Delete(0)
 
 	// Restore heap property
 	c.bubbleDown(0)
 
 	return res
+}
+
+func (c *Container[T]) Delete(i int) {
+	if i < 0 || i >= len(c.storage) {
+		return
+	}
+
+	c.storage[i], c.storage[len(c.storage)-1] = c.storage[len(c.storage)-1], c.storage[i]
+	c.storage = c.storage[:len(c.storage)-1]
+
+	if c.Len() == i {
+		return
+	}
+
+	if c.onIndexUpdate != nil {
+		c.onIndexUpdate(&c.storage[i], i)
+	}
+
+	// Restore heap property
+	if !c.bubbleDown(i) {
+		c.bubbleUp(i)
+	}
+
+	return
+}
+
+func (c *Container[T]) Insert(v T) {
+	c.storage = append(c.storage, v)
+
+	if c.onIndexUpdate != nil {
+		c.onIndexUpdate(&c.storage[len(c.storage)-1], len(c.storage)-1)
+	}
+
+	// Restore heap property
+	c.bubbleUp(len(c.storage) - 1)
 }
 
 func (c *Container[T]) GetByIndex(i int) (res T) {
@@ -60,24 +90,6 @@ func (c *Container[T]) GetByIndex(i int) (res T) {
 	return
 }
 
-func (c *Container[T]) Delete(i int) {
-	if i < 0 || i >= len(c.storage) {
-		return
-	}
-
-	c.storage[i], c.storage[len(c.storage)-1] = c.storage[len(c.storage)-1], c.storage[i]
-	c.storage = c.storage[:len(c.storage)-1]
-
-	if c.onIndexUpdate != nil {
-		c.onIndexUpdate(&c.storage[i], i)
-	}
-
-	// Restore heap property
-	c.bubbleDown(i)
-
-	return
-}
-
 func (c *Container[T]) PeekMin() T {
 	return c.storage[0]
 }
@@ -86,16 +98,42 @@ func (c *Container[T]) Len() int {
 	return len(c.storage)
 }
 
-func (c *Container[T]) Insert(v T) {
-	c.storage = append(c.storage, v)
+func (c *Container[T]) CheckMinCorrect() bool {
+	if c.Len() <= 0 {
+		return true
+	}
 
-	// Restore heap property
-	c.bubbleUp(len(c.storage) - 1)
+	minHeap := c.storage[0]
+
+	minCurr := minHeap
+	for _, v := range c.storage {
+		if v.Less(minCurr) {
+			minCurr = v
+		}
+	}
+
+	if minCurr.Less(minHeap) || minHeap.Less(minCurr) {
+		return false
+	}
+
+	return true
 }
 
-func (c *Container[T]) bubbleDown(i int) int {
+func (c *Container[T]) GetMinLinear() T {
+	minCurr := c.storage[0]
+	for _, v := range c.storage {
+		if v.Less(minCurr) {
+			minCurr = v
+		}
+	}
+
+	return minCurr
+}
+
+func (c *Container[T]) bubbleDown(i0 int) bool {
 	updateHook := c.onIndexUpdate != nil
 
+	i := i0
 	for i*2+1 <= len(c.storage)-1 {
 		iL := i*2 + 1
 		iR := i*2 + 2
@@ -124,7 +162,7 @@ func (c *Container[T]) bubbleDown(i int) int {
 		i = iChild
 	}
 
-	return i
+	return i > i0
 }
 
 func (c *Container[T]) bubbleUp(i int) {
