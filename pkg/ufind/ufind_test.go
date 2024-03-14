@@ -17,6 +17,18 @@ func createTestContainerLen7() Container[string] {
 	}
 }
 
+func createTestContainerDisjointLen7() Container[string] {
+	return Container[string]{
+		"a": &Node[string]{"b", 0},
+		"b": &Node[string]{"c", 1},
+		"c": &Node[string]{"d", 2},
+		"d": &Node[string]{"d", 3},
+		"e": &Node[string]{"e", 1},
+		"f": &Node[string]{"e", 0},
+		"g": &Node[string]{"e", 0},
+	}
+}
+
 func TestNew(t *testing.T) {
 	type args[T comparable] struct {
 		data []T
@@ -138,12 +150,66 @@ func TestContainer_Union(t *testing.T) {
 	}
 	tests := []testCase[string]{
 		{
-			// TODO
-			name:  "Merged 2 groups",
-			c:     nil,
-			args:  args[string]{},
-			want:  false,
-			wantC: nil,
+			name: "Merged 2 groups - ranks not updated",
+			c:    createTestContainerDisjointLen7(),
+			args: args[string]{
+				x: "a",
+				y: "f",
+			},
+			want: true,
+			wantC: Container[string]{
+				"a": &Node[string]{"d", 0},
+				"b": &Node[string]{"d", 1},
+				"c": &Node[string]{"d", 2},
+				"d": &Node[string]{"d", 3},
+				"e": &Node[string]{"d", 1},
+				"f": &Node[string]{"e", 0},
+				"g": &Node[string]{"e", 0},
+			},
+		},
+		{
+			name: "Merged 2 groups - ranks updated",
+			c: Container[string]{
+				"a": &Node[string]{"b", 0},
+				"b": &Node[string]{"b", 1},
+				"e": &Node[string]{"e", 1},
+				"f": &Node[string]{"e", 0},
+				"g": &Node[string]{"e", 0},
+			},
+			args: args[string]{
+				x: "a",
+				y: "f",
+			},
+			want: true,
+			wantC: Container[string]{
+				"a": &Node[string]{"b", 0},
+				"b": &Node[string]{"b", 2},
+				"e": &Node[string]{"b", 1},
+				"f": &Node[string]{"e", 0},
+				"g": &Node[string]{"e", 0},
+			},
+		},
+		{
+			name: "Error - entry not found",
+			c: Container[string]{
+				"a": &Node[string]{"b", 0},
+				"b": &Node[string]{"b", 1},
+				"e": &Node[string]{"e", 1},
+				"f": &Node[string]{"e", 0},
+				"g": &Node[string]{"e", 0},
+			},
+			args: args[string]{
+				x: "z",
+				y: "f",
+			},
+			want: false,
+			wantC: Container[string]{
+				"a": &Node[string]{"b", 0},
+				"b": &Node[string]{"b", 1},
+				"e": &Node[string]{"e", 1},
+				"f": &Node[string]{"e", 0},
+				"g": &Node[string]{"e", 0},
+			},
 		},
 	}
 	for _, tt := range tests {
