@@ -46,21 +46,21 @@ func main() {
 		}
 
 		// Balance heaps
-		if len(hLow)-len(hHigh) > 1 {
+		if hLow.Len()-hHigh.Len() > 1 {
 			hHigh.Insert(intLess(hLow.ExtractMin()))
 		}
 
-		if len(hHigh)-len(hLow) > 1 {
+		if hHigh.Len()-hLow.Len() > 1 {
 			hLow.Insert(intGreater(hHigh.ExtractMin()))
 		}
 
 		// Get median
-		if len(hLow) > len(hHigh) {
+		if hLow.Len() > hHigh.Len() {
 			mSum += int(hLow.PeekMin())
 			continue
 		}
 
-		if len(hLow) < len(hHigh) {
+		if hLow.Len() < hHigh.Len() {
 			mSum += int(hHigh.PeekMin())
 			continue
 		}
