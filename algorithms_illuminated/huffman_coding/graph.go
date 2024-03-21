@@ -20,6 +20,6 @@ func (n *Node) Merge(v *Node) *Node {
 		r:       v,
 		weight:  n.weight + v.weight,
 		maxRank: max(n.maxRank, v.maxRank) + 1,
-		minRank: min(n.maxRank, v.maxRank) + 1,
+		minRank: min(n.minRank, v.minRank) + 1,
 	}
 }
