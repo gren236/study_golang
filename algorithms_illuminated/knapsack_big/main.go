@@ -17,7 +17,7 @@ type item struct {
 
 func parseTestFile() ([]item, int) {
 	//inputRaw, _ := os.ReadFile("./algorithms_illuminated/knapsack_big/input_random_12_100_10.txt") // 133
-	inputRaw, _ := os.ReadFile("./algorithms_illuminated/knapsack_big/knapsack_big.txt") // 133
+	inputRaw, _ := os.ReadFile("./algorithms_illuminated/knapsack_big/knapsack_big.txt") // 4243395
 	inputStrings := strings.Split(string(inputRaw), "\n")
 
 	header := strings.Split(inputStrings[0], " ")
