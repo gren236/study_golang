@@ -15,9 +15,7 @@ type edge struct {
 
 // parseListFile returns each edge mapped to its weight and number of vertices
 func parseListFile(path string) (map[edge]int, int) {
-	//inputRaw, _ := os.ReadFile("./algorithms_illuminated/all_pair_shortest_path/input_random_10_8.txt") // -41
-	//inputRaw, _ := os.ReadFile("./algorithms_illuminated/all_pair_shortest_path/input_random_12_8.txt") // -234
-	inputRaw, _ := os.ReadFile(path) // -234
+	inputRaw, _ := os.ReadFile(path)
 	inputStrings := strings.Split(string(inputRaw), "\n")
 	headRow := strings.Split(inputStrings[0], " ")
 
